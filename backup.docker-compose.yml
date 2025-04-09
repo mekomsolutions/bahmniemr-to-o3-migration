@@ -1,0 +1,34 @@
+services:
+  create-backup-folder:
+    image: busybox:latest
+    command: ["sh", "-c", "mkdir -p /mnt/$$BACKUP_FOLDER"]
+    environment:
+      BACKUP_FOLDER: ${BACKUP_FOLDER}
+    volumes:
+      - "${BACKUP_PATH:-backup-path}:/mnt"
+  #
+  # MySQL backups
+  #
+  openmrs-db-backup:
+    image: mekomsolutions/mysql_backup:latest
+    depends_on:
+      create-backup-folder:
+        condition: service_completed_successfully
+    environment:
+      DB_HOST: openmrs-mysql
+      DB_NAME: openmrs
+      DB_USERNAME: ${OPENMRS_DB_USER}
+      DB_PASSWORD: ${OPENMRS_DB_PASSWORD}
+      BACKUP_PATH: "/opt/backup/${BACKUP_FOLDER}"
+    networks:
+      bahmni:
+        aliases:
+          - openmrs-db-backup
+    volumes:
+      - "${BACKUP_PATH:-backup-path}:/opt/backup/"
+
+volumes:
+  backup-path: ~
+
+networks:
+  bahmni:
