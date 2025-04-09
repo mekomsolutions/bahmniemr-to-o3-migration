@@ -14,3 +14,10 @@ build
 
 # Maven target directory
 target/
+
+# IntelliJ IDEA
+.idea/
+
+# VSCode
+.vscode/
+

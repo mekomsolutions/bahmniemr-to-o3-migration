@@ -1,6 +1,4 @@
-version: "3.7"
 services:
-
   # OpenMRS:
   openmrs:
     image: mekomsolutions/openmrs:bahmni_latest
@@ -20,11 +18,7 @@ services:
       DB_PASSWORD: ${OPENMRS_DB_PASSWORD}
       TZ: ${TIMEZONE}
     healthcheck:
-      test:
-        - CMD
-        - curl
-        - "-f"
-        - "http://localhost:8080/openmrs/"
+      test: [ CMD, curl, "-f", "http://localhost:8080/openmrs/" ]
       timeout: 5s
     networks:
       bahmni:
@@ -58,12 +52,7 @@ services:
       MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
       TZ: ${TIMEZONE}
     healthcheck:
-      test:
-        - CMD
-        - mysqladmin
-        - ping
-        - "-h"
-        - "localhost"
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 5s
     networks:
       bahmni:
