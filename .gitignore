@@ -21,3 +21,6 @@ target/
 # VSCode
 .vscode/
 
+# Backup folder
+backup-path/
+backups/
