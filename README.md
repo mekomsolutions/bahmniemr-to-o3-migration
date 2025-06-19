@@ -4,20 +4,27 @@
 
 Before starting the migration process, ensure you have completed the following preparations:
 
-- **OpenMRS Version**: Confirm the current OpenMRS core version running in your Bahmni environment.
-- **Docker & Compose Setup**: Docker and Docker Compose are installed on the migration server or on the machine where 
+- **OpenMRS Version**: Confirm the current OpenMRS core version running in your Bahmni environment. 
+  - The migration guide is designed for OpenMRS core versions 2.1.7, 2.2.1, 2.3.6, 2.4.5, 2.5.14, and 2.6.14. Adjust the `OPENMRS_WAR_URL` in the `./openmrs/Dockerfile` to match the desired version.
+- **Docker & Compose Setup**: Docker and Docker Compose are installed on the migration server or on the machine where the migration will be performed.
 - **Sufficient Disk Space**: Ensure ample disk space is available for database exports, backups, and restored instances.
 - **Database Tools**: `mysqldump` and `mysql` command-line tools are installed and accessible.
 - **Downtime Window**: A scheduled downtime window to ensure a consistent database export.
+- **Backup**: A complete backup of the Bahmni OpenMRS database is taken before starting the migration process.
 
+## Migration Steps
 
+Execute the following steps to migrate from Bahmni EMR to OpenMRS 3:
 
 ### 1. Copy the Database Backup
 - Copy the `dump.sql` database backup file to:
     - `sql/mysql`
 
+> Ensure the `dump.sql` file is the latest backup of your Bahmni OpenMRS database. 
+> It should be a complete export of the OpenMRS database from your Bahmni instance.
+
 ### 2. Rename the Dump
-- Rename the `dump.sql` file to `openmrs.sql`.
+- Rename the `dump.sql` file to `openmrs.sql`. This file will be used to initialize the OpenMRS database in the Docker container.
 
 ### 3. Spin-up MySQL and OpenMRS Services
 - Spin-up the `mysql` and `openmrs` services only:
@@ -105,8 +112,8 @@ you should see a confirmation message indicating that the search index has been 
 
 ### 17. Migrate Encounter Diagnoses
 
-- Follow [migrate encounter diagnoses guide](docs/migrate-encounter-diagnoses.md).
+- Follow [migrate encounter diagnoses guide.](docs/migrate-encounter-diagnoses.md)
 
 ### 18. Migrate Existing Attachments
 
-- Follow [migrate existing attachments guide](docs/migrate-existing-attachments.md).
+- Follow [migrate existing attachments guide.](docs/migrate-existing-attachments.md)
