@@ -1,6 +1,16 @@
 # Bahmni EMR to OpenMRS 3 Migration Guide
 
-## Sequentially migrate OpenMRS core versions
+## Prerequisites
+
+Before starting the migration process, ensure you have completed the following preparations:
+
+- **OpenMRS Version**: Confirm the current OpenMRS core version running in your Bahmni environment.
+- **Docker & Compose Setup**: Docker and Docker Compose are installed on the migration server or on the machine where 
+- **Sufficient Disk Space**: Ensure ample disk space is available for database exports, backups, and restored instances.
+- **Database Tools**: `mysqldump` and `mysql` command-line tools are installed and accessible.
+- **Downtime Window**: A scheduled downtime window to ensure a consistent database export.
+
+
 
 ### 1. Copy the Database Backup
 - Copy the `dump.sql` database backup file to:
@@ -49,9 +59,8 @@
     - To change the OpenMRS version, edit the `OPENMRS_WAR_URL` in the `./openmrs/Dockerfile`.
 
 ### 10. Backup the OpenMRS Database
-- In a separate terminal, backup the updated OpenMRS database:
-    - Follow the instructions in the "Backup databases and filestores" section in the README. 
-    - Only run the `openmrs-db-backup` service.
+- In a separate terminal, back up the updated OpenMRS database:
+    - Run `docker compose -f back.docker-compose.yml up -d`
 
 ### 11. Stop the Containers
 - Stop the containers by terminating the previous command (`docker compose up mysql openmrs --build`) in the terminal where it's running:
@@ -96,8 +105,8 @@ you should see a confirmation message indicating that the search index has been 
 
 ### 17. Migrate Encounter Diagnoses
 
-See [Migrate Encounter Diagnoses Guide](docs/migrate-encounter-diagnoses.md).
+- Follow [migrate encounter diagnoses guide](docs/migrate-encounter-diagnoses.md).
 
 ### 18. Migrate Existing Attachments
 
-See [Migrate Existing Attachments Guide](docs/migrate-existing-attachments.md).
+- Follow [migrate existing attachments guide](docs/migrate-existing-attachments.md).

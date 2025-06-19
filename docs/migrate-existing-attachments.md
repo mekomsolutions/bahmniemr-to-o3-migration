@@ -1,13 +1,16 @@
 # Migrate Existing Attachments
 
-### 1. Generate CSV for migration files
+To migrate existing attachments (patient files & documents in Bahmni) in OpenMRS complex observations, you need to follow these steps:
 
-Run the following commands to generate a CSV file mapping files on the filesystem to the corresponding obs:
+### 1. Generate a CSV File for Migration
+
+Run the following command to generate a CSV file that contains the current file paths and their new paths based on the UUIDs of the observations:
 
 ```bash
-  docker exec -it oz-hsc-uat-mysql-1 rm /tmp/migration_file_paths.csv # if exists
+  
+docker exec -it oz-hsc-uat-mysql-1 rm /tmp/migration_file_paths.csv # if exists
 
-docker exec -it oz-hsc-uat-mysql-1 mysql -uroot -p3cY8Kve4lGey openmrs -e "
+docker exec -it oz-hsc-uat-mysql-1 mysql -uroot -pmysql_root_password openmrs -e "
 SELECT 'file_path', 'new_file_path'
 UNION ALL
 SELECT
@@ -27,31 +30,36 @@ INTO OUTFILE '/tmp/migration_file_paths.csv'
 FIELDS TERMINATED BY ',' 
 LINES TERMINATED BY '\n';"
 ```
-Copy the generated CSV file to the host machine:
+
+ > The command above will create a CSV file named `migration_file_paths.csv` in the `/tmp` directory of the MySQL container, containing the current file paths and their new paths based on the UUIDs.
+
+### 2. Copy the CSV File to Host Machine
+After generating the CSV file, you need to copy it from the MySQL container to your host machine. Use the following command:
 
 ```bash
     docker cp oz-hsc-uat-mysql-1:/tmp/migration_file_paths.csv migration_file_paths.csv
 ```
 
-### 2. Run Complex Observation Migration Script
+### 3. Run Migration Script for Complex Observations
 
 Run the script from the root directory containing the unmigrated files:
 
 ```bash
   ./migrate_complex_obs.sh
 ```
+> This script will read the `migration_file_paths.csv` file, create a directory named `complex_obs` in your home directory, and move the files from their current locations to the new paths based on the UUIDs.
 
-### 3. Copy Files into the OpenMRS Container
+### 4. Copy Moved Files to OpenMRS Container
 
-- Copy the moved files/documents into the `complex_obs` directory inside the OpenMRS container:
+Copy the moved files/documents into the `complex_obs` directory inside the OpenMRS container to ensure they are accessible by OpenMRS:
 
 ```bash
   docker cp /home/ubuntu/complex_obs/. ozone-hsc-openmrs-1:/openmrs/data/complex_obs/
 ```
 
-### 4. Perform Database Migration for Complex Observations
+### 5. Perform Database Migration for Complex Observations
 
-- Run the following database migration to convert the migrated observations on the file system into complex observations:
+Run the following database migration to convert the migrated observations on the file system into complex observations:
 
 ```bash
     docker exec -it ozone-hsc-mysql-1 mysql -uroot -pmysql_root_password openmrs -e "UPDATE obs o
@@ -84,21 +92,21 @@ Run the script from the root directory containing the unmigrated files:
     AND o.value_text IS NOT NULL;"
 ```
 
-### 5. Verify Migration
+### 6. Verify Migration
 
-- Check the OpenMRS database to ensure that the complex observations have been migrated correctly:
+Check the OpenMRS database to ensure that the complex observations have been migrated correctly:
 
 ```bash
   docker exec -it ozone-hsc-mysql-1 mysql -uroot -pmysql_root_password openmrs -e "SELECT * FROM obs WHERE concept_id IN (SELECT concept_id FROM concept WHERE uuid IN ('7cac8397-53cd-4f00-a6fe-028e8d743f8e', '42ed45fd-f3f6-44b6-bfc2-8bde1bb41e00'));"
 ```
 
-### 6. Clean Up
-- Remove the temporary CSV file from the MySQL container:
+### 7. Clean Up
+Remove the temporary CSV file from the MySQL container:
 
 ```bash
   docker exec -it oz-hsc-uat-mysql-1 rm /tmp/migration_file_paths.csv
 ```
-- Optionally, remove the `complex_obs` directory if it is no longer needed:
+Optionally, remove the `complex_obs` directory if it is no longer needed:
 
 ```bash
   rm -rf /home/ubuntu/complex_obs
