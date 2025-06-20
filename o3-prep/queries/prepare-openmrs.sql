@@ -28,6 +28,10 @@ WHERE o.order_type_id = (SELECT order_type_id
     WHERE uuid = 'f8ae333e-9d1a-423e-a6a8-c3a0687ebcf2'
     LIMIT 1);
 
+-- Update orders of type test_order to have auto_expire_date set to null
+UPDATE orders SET auto_expire_date = null
+WHERE order_id IN (SELECT order_id FROM test_order);
+
 -- create patientflags_tag_role table
 CREATE TABLE openmrs.patientflags_tag_role
 (
