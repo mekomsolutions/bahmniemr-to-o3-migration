@@ -45,16 +45,19 @@ After generating the CSV file, you need to copy it from the MySQL container to y
 Run the script from the root directory containing the unmigrated files:
 
 ```bash
-  ./migrate_complex_obs.sh
+  ./migrate_complex_obs.sh  #
+  # or
+  ./migrate_complex_obs.sh <path_to_where_migrated_files_are_stored>
 ```
-> This script will read the `migration_file_paths.csv` file, create a directory named `complex_obs` in your home directory, and move the files from their current locations to the new paths based on the UUIDs.
+
+> This script will read the `migration_file_paths.csv` file, create a directory named `complex_obs` in your home directory (or the pass in dir), and move the files from their current locations to the new paths based on the UUIDs.
 
 ### 4. Copy Moved Files to OpenMRS Container
 
 Copy the moved files/documents into the `complex_obs` directory inside the OpenMRS container to ensure they are accessible by OpenMRS:
 
 ```bash
-  docker cp /home/ubuntu/complex_obs/. ozone-hsc-openmrs-1:/openmrs/data/complex_obs/
+  docker cp /home/ubuntu/complex_obs/. oz-hsc-uat-openmrs-1:/openmrs/data/complex_obs/
 ```
 
 ### 5. Perform Database Migration for Complex Observations
@@ -97,7 +100,12 @@ Run the following database migration to convert the migrated observations on the
 Check the OpenMRS database to ensure that the complex observations have been migrated correctly:
 
 ```bash
-  docker exec -it ozone-hsc-mysql-1 mysql -uroot -pmysql_root_password openmrs -e "SELECT * FROM obs WHERE concept_id IN (SELECT concept_id FROM concept WHERE uuid IN ('7cac8397-53cd-4f00-a6fe-028e8d743f8e', '42ed45fd-f3f6-44b6-bfc2-8bde1bb41e00'));"
+  docker exec -it ozone-hsc-mysql-1 mysql -uroot -pmysql_root_password openmrs -e "SELECT * FROM obs WHERE concept_id IN (SELECT concept_id FROM concept WHERE uuid IN ('7cac8397-53cd-4f00-a6fe-028e8d743f8e', '42ed45fd-f3f6-44b6-bfc2-8bde1bb41e00')) LIMIT 20;"
+```
+Note: This query checks for the presence of complex observations with the specified concept UUIDs. You can also check the `complex_obs` directory in the OpenMRS container to verify that the files have been moved correctly:
+
+```bash
+  docker exec -it oz-hsc-uat-openmrs-1 ls /openmrs/data/complex_obs/
 ```
 
 ### 7. Clean Up
@@ -114,5 +122,6 @@ Optionally, remove the `complex_obs` directory if it is no longer needed:
 
 ### Notes
 - Adjust the MySQL root password and container names as per your setup.
-- The script assumes that the unmigrated files are located in `/home/ubuntu/complex_obs/`. Adjust the path as necessary.
+- The script will move migrated files are into `/home/ubuntu/complex_obs/` dir. Adjust the path as necessary.
 - The script assumes that the OpenMRS database is named `openmrs`. Adjust the database name if it differs in your setup.
+- Some commands may require root or sudo privileges depending on your system configuration.

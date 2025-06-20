@@ -6,6 +6,9 @@ script_dir="$(dirname "$(realpath "$0")")"
 # Set the CSV file name (ensure this file exists and is in the same directory as the script)
 csv_file="$script_dir/migration_file_paths.csv"
 
+# Allow the target base directory to be set via the first argument, or fallback to default
+target_base_dir="${1:-/home/ubuntu/complex_obs}"
+
 # Check if the CSV file exists
 if [[ ! -f "$csv_file" ]]; then
     echo "CSV file not found!"
@@ -21,7 +24,7 @@ while IFS=',' read -r file_path new_file_path; do
 
     # Make file paths relative to the script's directory
     abs_file_path="$script_dir/$file_path"
-    abs_new_file_path="/bahmni-o3-migration/complex_obs/$new_file_path"
+    abs_new_file_path="$target_base_dir/$new_file_path"
 
     # Check if the source file exists
     if [[ ! -f "$abs_file_path" ]]; then
