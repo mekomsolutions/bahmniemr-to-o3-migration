@@ -67,7 +67,7 @@ Execute the following steps to migrate from Bahmni EMR to OpenMRS 3:
 
 ### 10. Backup the OpenMRS Database
 - In a separate terminal, back up the updated OpenMRS database:
-    - Run `docker compose -f back.docker-compose.yml up -d`
+    - Run `docker compose -f backup.docker-compose.yml up -d`
 
 ### 11. Stop the Containers
 - Stop the containers by terminating the previous command (`docker compose up mysql openmrs --build`) in the terminal where it's running:
