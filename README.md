@@ -64,6 +64,15 @@ Execute the following steps to migrate from Bahmni EMR to OpenMRS 3:
     **Important Notes**:
     - Do **not** terminate the containers when running version 2.6.14 as its corresponding database will need to be backed up in the next step.
     - To change the OpenMRS version, edit the `OPENMRS_WAR_URL` in the `./openmrs/Dockerfile`.
+- Retire concepts that are not compatible with OpenMRS 3 using the script `scripts/retire-concepts.sh`.
+- Ensure that the `concepts_to_retire.txt` file is in the same directory as the script, containing the UUIDs of concepts to be retired.
+
+    Example content of `concepts_to_retire.txt`: (severity concepts)
+    ```txt 
+    b821d08c-34f3-4614-9ae6-30a80bce0236
+    c728a231-e76a-4c68-aba6-a3909640f5b3
+    ```
+- After running the script, verify that the concepts have been retired successfully by checking the OpenMRS admin page or using SQL queries.
 
 ### 10. Backup the OpenMRS Database
 - In a separate terminal, back up the updated OpenMRS database:
